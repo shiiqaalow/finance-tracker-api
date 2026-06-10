@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+<<<<<<< HEAD
 import bcrypt from 'bcryptjs'
 // USER TABLE
 const userSchema = new mongoose.Schema({
@@ -31,3 +32,16 @@ userSchema.methods.comparePassword = function(inputPassword) {
 }
 
 export const User = mongoose.model('User',userSchema)
+=======
+
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: { type: String, unique: true },
+    password: String,
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("User", userSchema);
+>>>>>>> 1800e6af55e1c877a72e3e0b52621ae4d57c9875

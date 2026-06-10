@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Layout } from "./ui/Layout"
 import { Home } from "./pages/Home"
 import { CreateTransaction } from "./pages/Transaction"
@@ -38,3 +39,31 @@ export const App = () => {
     </Routes>
   )
 }
+=======
+import { useEffect, useState } from "react";
+import api from "./services";
+import Login from "./login.jsx";
+import Register from "./register.jsx";
+
+function App() {
+  const [isLogin, setIsLogin] = useState(true);
+
+  useEffect(() => {
+    api.get("/test")
+      .then((res) => console.log(res.data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  return (
+    <>
+      {isLogin ? (
+        <Login onSwitch={() => setIsLogin(false)} />
+      ) : (
+        <Register onSwitch={() => setIsLogin(true)} />
+      )}
+    </>
+  );
+}
+
+export default App;
+>>>>>>> 1800e6af55e1c877a72e3e0b52621ae4d57c9875
