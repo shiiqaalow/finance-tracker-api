@@ -1,0 +1,23 @@
+@import "tailwindcss";
+/* @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap'); */
+
+body{
+  min-height: 100vh;
+  color: white;
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 50%,
+    #6b46c1 100%
+  );
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+.root {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.brand {
+  font-family: 'Syne', sans-serif;
+}
