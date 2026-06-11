@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import express from 'express'
 import mongoose from 'mongoose'
 import helmet from 'helmet'
@@ -99,4 +98,3 @@ mongoose
     });
   })
   .catch((err) => console.log(err));
->>>>>>> 1800e6af55e1c877a72e3e0b52621ae4d57c9875
