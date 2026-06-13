@@ -35,18 +35,18 @@ if(process.env.NODE_ENV === 'development'){
 }
 // routes
 app.get('/',(req,res)=>{
-    res.status(200).send('Api is working')
+    res.status(200).send('Server is working 👍')
 })
 
-app.use('/auth',auth_routes)
-app.use('/users',user_routes)
-app.use('/transactions',trans_routes)
-app.use('/upload',upload_router)
-app.use('/categories', category_routes)
+app.use('/api/auth',auth_routes)
+app.use('/api/users',user_routes)
+app.use('/api/transactions',trans_routes)
+app.use('/api/upload',upload_router)
+app.use('/api/categories', category_routes)
 
 
 // swagger api
-app.use('/docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
+app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 
 // errorHandler
 app.use(errorHandler)
@@ -55,7 +55,7 @@ mongoose.connect(mongoURL)
     .then(()=>{
         console.log('Successfully connected to MONGODB')
         app.listen(port,()=>{
-            console.log(`Server is running on port ${port}`)
+            console.log(`Server is running on port http://localhost:${port}`)
         })
     })
     .catch((err)=> {
