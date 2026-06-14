@@ -7,11 +7,11 @@ const options = {
     info: {
       title: 'Task Manager API',
       version: '1.0.0',
-      description: 'API documentation for our task manager backend'
+      description: 'API documentation for our finance-tracker backend'
     },
     servers: [
       {
-        url: process.env.NODE_ENV === 'development' ? 'http://localhost:7000' : 'https://finance-tracker-api-8.onrender.com'
+        url: process.env.NODE_ENV === 'development' ? 'http://localhost:7000' : 'https://finance-tracker-api-if0z.onrender.com/'
       }
     ],
     components: {
