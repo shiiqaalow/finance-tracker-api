@@ -27,7 +27,8 @@ app.use(helmet())
 app.use(cors({
     origin: [
         `http://localhost:${port}`,
-        'http://localhost:5173'
+        'http://localhost:5173',
+        'http://localhost:5174',
     ]
 }))
 if(process.env.NODE_ENV === 'development'){
