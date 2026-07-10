@@ -161,6 +161,6 @@ category_routes.put(
 category_routes.delete(
   '/delete/:id',
   protect,
-  authorize('admin'),
+  authorize('admin','user'),
   deleteCategory
 );

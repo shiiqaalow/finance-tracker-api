@@ -60,7 +60,7 @@ export const upload_router = express.Router();
  */
 
 upload_router.post(
-  '/profile',
+  '/upload',
   protect,
   upload.single('file'),
   uploadFile

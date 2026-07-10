@@ -1,3 +1,7 @@
+import {path} from 'path'
+import { pathToFileURL } from 'url'
+
+
 import express from 'express'
 import mongoose from 'mongoose'
 import helmet from 'helmet'
@@ -42,12 +46,29 @@ app.get('/',(req,res)=>{
 app.use('/api/auth',auth_routes)
 app.use('/api/users',user_routes)
 app.use('/api/transactions',trans_routes)
-app.use('/api/upload',upload_router)
+app.use('/api/profile',upload_router)
 app.use('/api/categories', category_routes)
 
 
 // swagger api
 app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
+
+
+// Server frontend in Production
+
+if(process.env.NODE_ENV === 'production' ) {
+    const _dirname = path.dirname(fileURLToPath(import.meta.url))
+
+    app.use(express.static(path.join(_dirname,'../frontend/dist')))
+
+    // serve the frontend app
+
+    app.get(/.*/,(req,res)=>{
+        res.send(path.join(_dirname,'..','frontend','dist','index.html'))
+    })
+}
+
+
 
 // errorHandler
 app.use(errorHandler)

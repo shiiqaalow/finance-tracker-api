@@ -1,40 +1,68 @@
-import { Layout } from "./ui/Layout"
-import { Home } from "./pages/Home"
-import { CreateTransaction } from "./pages/Transaction"
-import { Users } from "./pages/Users"
-import { Report } from "./pages/Report"
-import { Profile } from "./pages/Profile"
-import { Signup } from "./pages/Signup"
-import { Signin } from "./pages/Signin"
-import api from './server'
+import { Route, Routes } from "react-router";
 
-import { Route, Routes } from "react-router"
-import { useEffect } from "react"
+import { SignupPage } from "./pages/auth/SignupPage";
+import { SigninPage } from "./pages/auth/SigninPage";
+
+import { DashboardLayout } from "./components/Dashboard/DashboardLayout";
+import { ProtectedRoutes } from "./components/auth/ProtectedRoutes";
+import { AdminRoute } from "./components/auth/AdminRoute";
+
+import { Dashboard } from "./pages/dashboard/Dashboard";
+import { AdminDashboard } from "./pages/dashboard/AdminDashboard";
+import { Transactions } from "./pages/dashboard/Transactions";
+import { UsersPage } from "./pages/dashboard/UsersPage";
+import { Report } from "./pages/dashboard/Report";
+import { Profile } from "./pages/dashboard/Profile";
+import { Home } from "./pages/Home";
+import { CategoriesPage } from "./pages/dashboard/CategoriesPage";
+import {Summary} from "./pages/dashboard/Summary";
+import { MonthlySummaryPage } from "./pages/dashboard/MonthlySummary";
+import { Logout } from "./pages/dashboard/Logout";
 
 export const App = () => {
-  useEffect(()=>{
-    api.get('/')
-      .then((res) => {
-        // alert("Backend connection success:")
-        console.log("Backend connection success:", res.data)
-      })
-      
-      .catch((err) => {
-        // alert("Backend connection failed:")
-        console.log("Backend connection failed:", err)
-      });
-    },[])
   return (
     <Routes>
-      <Route path="/" element={ <Layout />}>
-        <Route index element={<Home />} />
-        <Route path="/transaction" element={<CreateTransaction />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/report" element={<Report />} />
+      {/* Public */}
+      <Route path="/" element={<SigninPage />} />
+      <Route path="/signin" element={<SigninPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+
+      {/* Protected */}
+      <Route
+        element={
+          <ProtectedRoutes>
+            <DashboardLayout />
+          </ProtectedRoutes>
+        }
+      >
+        {/* User Dashboard */}
+        <Route path="/dashboard/user" element={<Dashboard />} />
+
+        {/* Admin Only */}
+        <Route
+          path="/dashboard/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+
+        {/* Transactions */}
+        <Route path="/transactions" element={<Transactions />} />
+        <Route path="/transactions/create" element={<Transactions />} />
+        <Route path="/transactions/update/:id" element={<Transactions />} />
+        {/* Shared */}
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/summary" element={<Summary />} />
+        <Route path="/monthly-summary" element={<MonthlySummaryPage />} />
+        <Route path="/reports" element={<Report />} />
         <Route path="/me" element={<Profile />} />
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/logout" element={<Logout />} />
+
       </Route>
     </Routes>
-  )
-}
+  );
+};

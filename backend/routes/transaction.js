@@ -210,7 +210,7 @@ trans_routes.get(
 trans_routes.get(
   '/summary',
   protect,
-  authorize('admin'),
+  authorize('admin','user'),
   summary
 );
 

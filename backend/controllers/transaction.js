@@ -1,16 +1,23 @@
 import { Transaction } from "../models/transactioin.js";
-
+import { Category } from "../models/category.js";
 // create transaction
 export const createTransaction = async (req, res, next) => {
   const { title, amount, type, category } = req.body;
   const createdBy = req.user?.id;
   try {
+    const categoryDoc = await Category.findById(category);
+
+    if (!categoryDoc) {
+      return res.status(404).json({
+        message: "Category not found",
+      });
+    }
     // check if there is transaction already
     const existingTrans = await Transaction.findOne({
       title,
       amount,
       type,
-      category,
+      category: categoryDoc._id,
       createdBy,
     });
     if (existingTrans) {
@@ -20,7 +27,7 @@ export const createTransaction = async (req, res, next) => {
       title,
       amount,
       type,
-      category,
+      category: categoryDoc._id,
       createdBy,
     });
     res.status(201).json(transaction);
@@ -33,24 +40,34 @@ export const getTransactions = async (req, res, next) => {
   const userId = req.user.id;
 
   try {
-    // get all transaction admin only
-    let transactions = null;
+    let transactions;
+
     if (req.user.role === "admin") {
-      transactions = await Transaction.find();
+      // Admin gets all transactions with category and creator info
+      transactions = await Transaction.find()
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("createdBy", "name email profilePicture");
     } else {
-      // get all transaction each user's transaction
+      // Normal user gets only their own transactions
       transactions = await Transaction.find({
         createdBy: userId,
-      });
+      })
+        .sort({ createdAt: -1 })
+        .populate("category");
     }
 
     if (transactions.length === 0) {
       return res.status(404).json({
+        success: false,
         message: "No transactions found",
       });
     }
 
-    res.status(200).json(transactions);
+    return res.status(200).json({
+      success: true,
+      transactions,
+    });
   } catch (error) {
     next(error);
   }
@@ -79,12 +96,18 @@ export const updateTransaction = async (req, res, next) => {
 export const deleteTransaction = async (req, res, next) => {
   const userId = req.user.id;
   const transId = req.params.id;
+  const isAdmin = req.user.role === "admin";
   try {
-    // find transaction to delete
-    const deleteTrans = await Transaction.findOneAndDelete({
-      _id: transId,
-      createdBy: userId,
-    });
+    let deleteTrans = null;
+    if (isAdmin) {
+      deleteTrans = await Transaction.findOneAndDelete({ _id: transId });
+    } else {
+      // find transaction to delete
+      deleteTrans = await Transaction.findOneAndDelete({
+        _id: transId,
+        createdBy: userId,
+      });
+    }
     if (!deleteTrans) {
       return res.status(404).json({ message: "No Transaction found" });
     }
@@ -96,94 +119,128 @@ export const deleteTransaction = async (req, res, next) => {
 
 export const summary = async (req, res, next) => {
   try {
-    let result;
+    const pipeline = [];
 
-    if (req.user.role === "admin") {
-      result = await Transaction.aggregate([
-        {
-          $group: {
-            _id: "$category",
-            totalAmount: { $sum: "$amount" },
-            totalTransaction: { $sum: 1 }
-          }
-        }
-      ]);
-    } else {
-      result = await Transaction.aggregate([
-        {
-          $match: {
-            createdBy: req.user.id
-          }
+    if (req.user.role !== "admin") {
+      pipeline.push({
+        $match: {
+          createdBy: req.user._id,
         },
-        {
-          $group: {
-            _id: "$category",
-            totalAmount: { $sum: "$amount" },
-            totalTransaction: { $sum: 1 }
-          }
-        }
-      ]);
+      });
     }
+
+    pipeline.push(
+      {
+        $group: {
+          _id: "$category",
+          totalAmount: { $sum: "$amount" },
+          totalTransaction: { $sum: 1 },
+        },
+      },
+
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+
+      {
+        $unwind: "$categoryInfo",
+      },
+
+      {
+        $project: {
+          _id: 0,
+          name: "$categoryInfo.name",
+          type: "$categoryInfo.type",
+          totalAmount: 1,
+          totalTransaction: 1,
+        },
+      },
+    );
+
+    const result = await Transaction.aggregate(pipeline);
 
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
+
 export const monthlySummary = async (req, res, next) => {
   try {
     const startOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
-      1
+      1,
     );
 
     const endOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth() + 1,
-      1
+      1,
     );
 
-    let result;
+    const pipeline = [];
 
-    if (req.user.role === "admin") {
-      result = await Transaction.aggregate([
-        {
-          $match: {
-            date: {
-              $gte: startOfMonth,
-              $lt: endOfMonth
-            }
-          }
+    pipeline.push({
+      $match: {
+        date: {
+          $gte: startOfMonth,
+          $lt: endOfMonth,
         },
-        {
-          $group: {
-            _id: "$category",
-            totalAmount: { $sum: "$amount" },
-            totalTransaction: { $sum: 1 }
-          }
-        }
-      ]);
-    } else {
-      result = await Transaction.aggregate([
-        {
-          $match: {
-            createdBy: req.user._id,
-            date: {
-              $gte: startOfMonth,
-              $lt: endOfMonth
-            }
-          }
+      },
+    });
+
+    if (req.user.role !== "admin") {
+      pipeline.push({
+        $match: {
+          createdBy: req.user._id,
         },
-        {
-          $group: {
-            _id: "$category",
-            totalAmount: { $sum: "$amount" },
-            totalTransaction: { $sum: 1 }
-          }
-        }
-      ]);
+      });
     }
+
+    pipeline.push(
+      {
+        $group: {
+          _id: "$category",
+          totalAmount: {
+            $sum: "$amount",
+          },
+          totalTransaction: {
+            $sum: 1,
+          },
+        },
+      },
+
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+
+      {
+        $unwind: "$categoryInfo",
+      },
+
+      {
+        $project: {
+          _id: 0,
+          name: "$categoryInfo.name",
+          type: "$categoryInfo.type",
+          totalAmount: 1,
+          totalTransaction: 1,
+        },
+      },
+    );
+
+    const result = await Transaction.aggregate(pipeline);
 
     res.status(200).json(result);
   } catch (error) {

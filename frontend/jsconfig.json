@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+  ],
+  "compilerOptions": {
+    "checkJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["public/logo/src/*"]
+    }
+  }
+}

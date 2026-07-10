@@ -15,7 +15,7 @@ export const signup = async (req,res,next) => {
         const user = await User.create({ name,email,password,role,profilePicture })
         // generate token ( cant login without it ) for the new user 
         const token = generateToken(user._id)
-        res.status(201).json({ message: 'user successfully registered.',user: user,signup_token: token })
+        res.status(201).json({ message: 'user successfully registered.' })
 
     } catch (error) {
         next(error)
@@ -33,7 +33,7 @@ export const signin = async (req,res,next) => {
         }
         // generate token ( cant login without it ) for the new user 
         const token = generateToken(user._id)
-        res.status(201).json({ message: 'user successfully signed in.',user: user,signin_token: token })
+        res.status(201).json({ message: 'user successfully signed in.',user,token })
     } catch (error) {
         next(error)
     }

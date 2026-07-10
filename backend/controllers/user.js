@@ -20,7 +20,7 @@ export const getUser = async (req,res,next) => {
         const user_id = req.params.id
         const user = await User.findById(user_id)
         if(!user){
-            return res.status(404).json({ message: 'NO user found.' })
+            return res.status(404).json({ message: 'No user found.' })
         }
         res.status(200).json(user)
 
@@ -36,11 +36,11 @@ export const updateUser = async (req,res,next) => {
     const data = req.body
     try {
         // check if the user is registered or not
-        const update_user = await User.findByIdAndUpdate(user_id,data,{new: true})
-        if(!update_user) {
+        const updated_user = await User.findByIdAndUpdate(user_id,data,{new: true})
+        if(!updated_user) {
             return res.status(404).json({ message: 'No users found' })
         }
-        res.status(200).json({ message: 'user successfully updated.',updated_user:{update_user} })
+        res.status(200).json({ message: 'user successfully updated.',updated_user })
 
     } catch (error) {
         next(error)
