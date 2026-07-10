@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "../lib/store/authStore";
-const API_URL = "http://localhost:7000/api";
+const API_URL = "https://finance-tracker-api-if0z.onrender.com/api";
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
