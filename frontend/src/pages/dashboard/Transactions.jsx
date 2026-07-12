@@ -279,7 +279,7 @@ export const Transactions = () => {
 
           {filteredTransactions?.length > 0 ? (
             <div className="space-y-3">
-              {filteredTransactions.map((transaction) => (
+              {filteredTransactions?.map((transaction) => (
                 <TransactionCard
                   key={transaction._id}
                   transaction={transaction}

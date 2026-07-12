@@ -37,7 +37,7 @@ import { useState } from "react";
 export const TransactionCard = ({ transaction, onEdit }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const CategoryIcon = (() => {
-    switch (transaction.category.name.toLowerCase()) {
+    switch (transaction?.category?.name.toLowerCase()) {
       case "food":
         return Utensils;
 
