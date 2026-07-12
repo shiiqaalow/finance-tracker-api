@@ -62,7 +62,7 @@ user_routes.get('/',protect,authorize('admin'),getUsers);
  */
 user_routes.get(
     '/:id', protect, 
-    authorize('admin'), 
+    authorize('admin','user'), 
     getUser
 );
 
