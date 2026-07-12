@@ -67,7 +67,7 @@ export const Dashboard = () => {
   const safeCategories = categories ?? [];
 
   // total income and expense
-  const totals = transactions.reduce(
+  const totals = safeTransactions.reduce(
     (sum, transaction) => {
       if (transaction.type === "income") {
         sum.income += transaction.amount;
@@ -83,7 +83,7 @@ export const Dashboard = () => {
     },
   );
 
-  const recentTransactions = [...transactions]
+  const recentTransactions = [...safeTransactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 

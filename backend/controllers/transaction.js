@@ -43,25 +43,14 @@ export const getTransactions = async (req, res, next) => {
     let transactions;
 
     if (req.user.role === "admin") {
-      // Admin gets all transactions with category and creator info
       transactions = await Transaction.find()
         .sort({ createdAt: -1 })
         .populate("category")
         .populate("createdBy", "name email profilePicture");
     } else {
-      // Normal user gets only their own transactions
-      transactions = await Transaction.find({
-        createdBy: userId,
-      })
+      transactions = await Transaction.find({ createdBy: userId })
         .sort({ createdAt: -1 })
         .populate("category");
-    }
-
-    if (transactions.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No transactions found",
-      });
     }
 
     return res.status(200).json({
