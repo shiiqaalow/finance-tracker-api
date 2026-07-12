@@ -27,7 +27,21 @@ const mongoURL =
         ? process.env.MONGO_URL_DEV
         : process.env.MONGO_URL_PRO
 
-app.use(helmet())
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https://res.cloudinary.com",
+        ],
+      },
+    },
+  })
+);
+
 app.use(cors({
     origin: [
         `http://localhost:${port}`,
